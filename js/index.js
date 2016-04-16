@@ -93,7 +93,7 @@ var BuildHTML = function () {
   }
 
   BuildHTML.prototype._build = function _build(text, who) {
-    return '<div class="' + this.messageWrapper + ' ' + this[who + 'Class'] + '">\n              <div class="' + this.circleWrapper + ' animated bounceIn"></div>\n              <div class="' + this.textWrapper + '">...</div>\n            </div>';
+    return '<div class="' + this.messageWrapper + ' ' + this[who + 'Class'] + '">\n              <div class="' + this.circleWrapper + ' animated bounceIn"></div>\n              <div class="' + this.textWrapper + ' animated fadeIn">...</div>\n            </div>';
   };
 
   BuildHTML.prototype.me = function me(text) {
@@ -105,6 +105,24 @@ var BuildHTML = function () {
   };
 
   return BuildHTML;
+}();
+
+
+var RandomCatSound = function() {
+
+        function RandomCat() {
+                this.messages = ["Meow", "Prrrr", "RRRAAAARRRRR"];
+        }
+
+        RandomCat.prototype = Object(null);
+        RandomCat.prototype.constructor = RandomCat;
+
+        RandomCat.prototype.getSound = function() {
+           var random =  Math.floor(Math.random() * this.messages.length);
+            return this.messages[random];
+        }
+
+    return new RandomCat();
 }();
 
 $(document).ready(function () {
@@ -121,18 +139,16 @@ $(document).ready(function () {
   }
 
   function animateText() {
-    setTimeout(function () {
-      $content.find('.message-wrapper').last().find('.text-wrapper').addClass('animated fadeIn');
-    }, 350);
+      var anon = function() {
+          $content.find('.message-wrapper').last().find('.text-wrapper').addClass('animated fadeIn');
+      };
+    setTimeout(anon, 350);
   }
 
   function scrollBottom() {
-    $($inner).animate({
-      scrollTop: $($content).offset().top + $($content).outerHeight(true)
-    }, {
-      queue: false,
-      duration: 'ease'
-    });
+      $($inner).animate({ scrollTop: $(".content").height() });
+
+
   }
 
   function buildSent(message) {
@@ -161,28 +177,61 @@ $(document).ready(function () {
 
     $input.val('');
     $input.focus();
+      var anon = function() {
+          messenger.recieve(RandomCatSound.getSound());
+
+      }
+      setTimeout(anon, 1500);
+      if (navigator.userAgent.indexOf("Safari") > -1) {
+          console.log("is safari!");
+          document.activeElement.blur();
+      }
   }
 
   messenger.onSend = buildSent;
   messenger.onRecieve = buildRecieved;
-
-  setTimeout(function () {
-    messenger.recieve('Hello there!');
-  }, 1500);
-
-  setTimeout(function () {
-    messenger.recieve('Do you like this? If so check out more on my page...');
-  }, 5000);
-
-  setTimeout(function () {
-    messenger.recieve('Or maybe just give it a like!');
-  }, 7500);
 
   $input.focus();
 
   $send.on('click', function (e) {
     sendMessage();
   });
+
+    var isOptionsOpen = false;
+    $(".options").on("click", function(e) {
+        console.log("CLICKED OPTIONS!");
+        if (window.innerWidth < 560) {
+            if (isOptionsOpen == false) {
+                isOptionsOpen = true;
+                $('.wrapper').css({
+                    '-webkit-transform': 'translateX(-90%)',
+                    '-moz-transform': 'translateX(-90%)',
+                    '-ms-transform': 'translateX(-90%)',
+                    '-o-transform': 'translateX(-90%)',
+                    'transform': 'translateX(-90%)'
+                });
+            } else {
+                isOptionsOpen = false;
+                $('.wrapper').css({
+                    '-webkit-transform': '',
+                    '-moz-transform': '',
+                    '-ms-transform': '',
+                    '-o-transform': '',
+                    'transform': ''
+                });
+            }
+        }
+
+    });
+
+    $(document).ready(function() {
+        var userAgent = window.navigator.userAgent;
+        console.log("ON LOAD")
+        if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i)) {
+            $('#bottom').css({
+                'bottom': '55px'
+            });
+        }    });
 
   $input.on('keydown', function (e) {
     var key = e.which || e.keyCode;
